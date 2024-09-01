@@ -4,7 +4,7 @@ from tqdm import tqdm
 from utils import Data_Process
 import torch
 import torch.nn as nn
-from model import NeurJudge,NeurJudgeV3,NeurJudgeV4
+from model import NeurJudge
 import logging
 import random
 import torch.nn.functional as F
@@ -13,12 +13,22 @@ from torch.autograd import Variable
 import numpy as np
 from tqdm import tqdm
 import os
-from word2vec import toembedding
+# from word2vec import toembedding
 random.seed(42)
 logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt = '%m/%d/%Y %H:%M:%S',
                     level = logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+# 读取JSON文件
+def read_json(file_path):
+    file_path = file_path
+    data = []
+    with open(file_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            data.append(json.loads(line))
+    return data
 
 def get_value(res):
     # According to https://github.com/dice-group/gerbil/wiki/Precision,-Recall-and-F1-measure
@@ -107,7 +117,8 @@ def eval_data_types(target,prediction,num_labels):
     return 0
 
 #embedding = toembedding()
-embedding = 1
+with open("./data/word2vec.json", 'r', encoding='utf-8') as f:
+    embedding = json.load(f)
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -117,22 +128,25 @@ model = NeurJudge(embedding)
 model = model.to(device)
 model_name = '_neural_judge_0'
 print(model_name)
-PATH = './'+model_name
-model.load_state_dict(torch.load(PATH))
+PATH = './data/'+model_name
+# model.load_state_dict(torch.load(PATH))
 model.to(device)
 
-data_all = []
+data = read_json('./data/sample10_result_gpt-4o-2024-08-06-editquery-1.json')
 
-id2charge = json.load(open('./id2charge.json'))
-time2id = json.load(open('./time2id.json'))
-f = open('./test.json','r')
-for index,lines in enumerate(f):
-    # if index>10:
-    #     break
-    data_all.append(lines)
+id2charge = json.load(open('./data/id2charge.json'))
+time2id = json.load(open('./data/time2id.json'))
 
-print(len(data_all))
-dataloader = DataLoader(data_all, batch_size = batch_size_dim, shuffle=False, num_workers=0, drop_last=False)
+predictions = {"c": [], "q": []}
+# 提取预测罪名和标准罪名标签
+for record in data:
+    predictions["q"].append(record["fact"])
+    for candidate in record.get("candidate", []):
+        predictions["c"].append(candidate["fact"])
+
+
+#print(len(data_all))
+dataloader = DataLoader(predictions["q"], batch_size = batch_size_dim, shuffle=False, num_workers=0, drop_last=False)
 
 process = Data_Process()
 legals,legals_len,arts,arts_sent_lent,charge_tong2id,id2charge_tong,art2id,id2art = process.get_graph()

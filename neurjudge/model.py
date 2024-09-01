@@ -55,9 +55,6 @@ class MaskGRU(nn.Module):
 class NeurJudge(nn.Module):
     def __init__(self,embedding):
         super(NeurJudge, self).__init__()
-        self.charge_tong = json.load(open('./charge_tong.json'))
-        self.art_tong = json.load(open('./art_tong.json'))
-        self.id2charge = json.load(open('./id2charge.json'))
         self.data_size = 200
         self.hidden_dim = 150
         
@@ -73,7 +70,7 @@ class NeurJudge(nn.Module):
         self.encoder_term = nn.GRU(self.hidden_dim * 6, self.hidden_dim*3, batch_first=True, bidirectional=True)
         self.encoder_article = nn.GRU(self.hidden_dim * 8, self.hidden_dim*4, batch_first=True, bidirectional=True)
 
-        self.id2article = json.load(open('./id2article.json'))
+        self.id2article = json.load(open('./data/id2article.json'))
         self.mask_attention_article = Mask_Attention()
 
         self.encoder_charge = nn.GRU(self.data_size,self.hidden_dim, batch_first=True, bidirectional=True)

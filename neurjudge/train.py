@@ -21,8 +21,8 @@ logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(messa
                     level = logging.INFO)
 logger = logging.getLogger(__name__)
 
-#embedding = toembedding()
-embedding = [1]
+with open("./data/word2vec.json", 'r', encoding='utf-8') as f:
+    embedding = json.load(f)
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

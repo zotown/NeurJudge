@@ -2,15 +2,15 @@ import json
 import torch
 class Data_Process():
     def __init__(self):
-        self.word2id = json.load(open('./word2id.json', "r"))
-        self.charge2id = json.load(open('./charge2id.json'))
-        self.article2id = json.load(open('./article2id.json'))
-        self.time2id = json.load(open('./time2id.json'))
+        self.word2id = json.load(open('./data/word2id.json', "r"))
+        self.charge2id = json.load(open('./data/charge2id.json'))
+        self.article2id = json.load(open('./data/article2id.json'))
+        self.time2id = json.load(open('./data/time2id.json'))
         self.symbol = [",", ".", "?", "\"", "”", "。", "？", "","，",",","、","”"]
         self.last_symbol = ["?", "。", "？"]
-        self.charge2detail = json.load(open('./charge_details.json','r'))
+        self.charge2detail = json.load(open('./data/charge_details.json','r'))
         self.sent_max_len = 200
-        self.law = json.load(open('./law.json'))
+        self.law = json.load(open('./data/law.json'))
     def transform(self, word):
         if not (word in self.word2id.keys()):
             return self.word2id["UNK"]
@@ -110,8 +110,8 @@ class Data_Process():
     
 
     def get_graph(self):
-        charge_tong = json.load(open('./charge_tong.json'))
-        art_tong = json.load(open('./art_tong.json'))
+        charge_tong = json.load(open('./data/charge_tong.json'))
+        art_tong = json.load(open('./data/art_tong.json'))
         charge_tong2id = {}
         id2charge_tong = {}
         legals = []
