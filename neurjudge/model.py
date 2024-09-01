@@ -55,9 +55,12 @@ class MaskGRU(nn.Module):
 class NeurJudge(nn.Module):
     def __init__(self,embedding):
         super(NeurJudge, self).__init__()
+        self.charge_tong = json.load(open('./data/charge_tong.json'))
+        self.art_tong = json.load(open('./data/art_tong.json'))
+        self.id2charge = json.load(open('./data/id2charge.json'))
         self.data_size = 200
         self.hidden_dim = 150
-        
+
         self.embs = nn.Embedding(339503, 200)
         if len(embedding)==339503:
             self.embs.weight.data.copy_(embedding)

@@ -139,34 +139,34 @@ class Data_Process():
         
 
     def process_data(self,data):
-        fact_all = []
-        charge_label = []
-        article_label = []
-        time_label = []
-        for index,line in enumerate(data):
-            line = json.loads(line)
-            fact = line['fact']
-            charge = line['charge']
-            article = line['article']
-            if line['meta']['term_of_imprisonment']['death_penalty'] == True or line['meta']['term_of_imprisonment']['life_imprisonment'] == True:
-                time_labels = 0
-            else:
-                time_labels = self.time2id[str(line['meta']['term_of_imprisonment']['imprisonment'])]
-  
-            charge_label.append(self.charge2id[charge[0]])
-            article_label.append(self.article2id[str(article[0])])
-
-            
-            time_label.append(int(time_labels))
-
-            fact_all.append(self.parse(fact))
-
-        article_label = torch.tensor(article_label,dtype=torch.long)
-        charge_label = torch.tensor(charge_label,dtype=torch.long)
-        time_label = torch.tensor(time_label,dtype=torch.long)
+        fact_all = data
+        # charge_label = []
+        # article_label = []
+        # time_label = []
+        # for index,line in enumerate(data):
+        #     line = json.loads(line)
+        #     fact = line['fact']
+        #     charge = line['charge']
+        #     article = line['article']
+        #     if line['meta']['term_of_imprisonment']['death_penalty'] == True or line['meta']['term_of_imprisonment']['life_imprisonment'] == True:
+        #         time_labels = 0
+        #     else:
+        #         time_labels = self.time2id[str(line['meta']['term_of_imprisonment']['imprisonment'])]
+        #
+        #     charge_label.append(self.charge2id[charge[0]])
+        #     article_label.append(self.article2id[str(article[0])])
+        #
+        #
+        #     time_label.append(int(time_labels))
+        #
+        #     fact_all.append(self.parse(fact))
+        #
+        # article_label = torch.tensor(article_label,dtype=torch.long)
+        # charge_label = torch.tensor(charge_label,dtype=torch.long)
+        # time_label = torch.tensor(time_label,dtype=torch.long)
 
         documents,sent_lent = self.seq2tensor(fact_all,max_len=350)
-        return charge_label,article_label,time_label,documents,sent_lent
+        return documents,sent_lent
 
 
     def process_law(self,label_names,type = 'charge'):

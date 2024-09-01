@@ -163,28 +163,29 @@ true_time = []
 
 for step,batch in enumerate(tqdm(dataloader)):
     model.eval()
-    charge_label,article_label,time_label,documents,sent_lent = process.process_data(batch)
+    documents,sent_lent = process.process_data(batch)
     documents = documents.to(device)
     
     sent_lent = sent_lent.to(device)
-    true_article.extend(article_label.numpy())
-    true_charge.extend(charge_label.numpy())
-    true_time.extend(time_label.numpy())
+    # true_article.extend(article_label.numpy())
+    # true_charge.extend(charge_label.numpy())
+    # true_time.extend(time_label.numpy())
 
     with torch.no_grad():
         charge_out,article_out,time_out = model(legals,legals_len,arts,arts_sent_lent,charge_tong2id,id2charge_tong,art2id,id2art,documents,sent_lent,process,device)
         
     charge_pred = charge_out.cpu().argmax(dim=1).numpy()
-    article_pred = article_out.cpu().argmax(dim=1).numpy()
-    time_pred = time_out.cpu().argmax(dim=1).numpy()
-
-    predictions_article.extend(article_pred)
-    predictions_charge.extend(charge_pred)
-    predictions_time.extend(time_pred)
-
-print('罪名')
-eval_data_types(true_charge,predictions_charge,num_labels=115)
-print('法条')
-eval_data_types(true_article,predictions_article,num_labels=99)
-print('刑期')
-eval_data_types(true_time,predictions_time,num_labels=11)
+    print(charge_pred)
+#     article_pred = article_out.cpu().argmax(dim=1).numpy()
+#     time_pred = time_out.cpu().argmax(dim=1).numpy()
+#
+#     predictions_article.extend(article_pred)
+#     predictions_charge.extend(charge_pred)
+#     predictions_time.extend(time_pred)
+#
+# print('罪名')
+# eval_data_types(true_charge,predictions_charge,num_labels=115)
+# print('法条')
+# eval_data_types(true_article,predictions_article,num_labels=99)
+# print('刑期')
+# eval_data_types(true_time,predictions_time,num_labels=11)
