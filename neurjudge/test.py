@@ -138,15 +138,17 @@ id2charge = json.load(open('./data/id2charge.json'))
 time2id = json.load(open('./data/time2id.json'))
 
 predictions = {"c": [], "q": []}
+id_all=[]
 # 提取预测罪名和标准罪名标签
 for record in data:
     predictions["q"].append(record["fact"])
     for candidate in record.get("candidate", []):
         predictions["c"].append(candidate["fact"])
+        id_all.append(candidate["pid"])
 
 
 #print(len(data_all))
-dataloader = DataLoader(predictions["q"], batch_size = batch_size_dim, shuffle=False, num_workers=0, drop_last=False)
+dataloader = DataLoader(predictions["c"], batch_size = batch_size_dim, shuffle=False, num_workers=0, drop_last=False)
 
 process = Data_Process()
 legals,legals_len,arts,arts_sent_lent,charge_tong2id,id2charge_tong,art2id,id2art = process.get_graph()
@@ -160,10 +162,11 @@ true_article = []
 true_charge = []
 true_time = []
 
-
+predictions_charge=[]
+results=[]
 for step,batch in enumerate(tqdm(dataloader)):
     model.eval()
-    documents,sent_lent = process.process_data(batch)
+    documents,sent_lent= process.process_data(batch)
     documents = documents.to(device)
     
     sent_lent = sent_lent.to(device)
@@ -175,7 +178,17 @@ for step,batch in enumerate(tqdm(dataloader)):
         charge_out,article_out,time_out = model(legals,legals_len,arts,arts_sent_lent,charge_tong2id,id2charge_tong,art2id,id2art,documents,sent_lent,process,device)
         
     charge_pred = charge_out.cpu().argmax(dim=1).numpy()
-    print(charge_pred)
+    predictions_charge.extend(charge_pred)
+
+with open('./data/id2charge.json', 'r', encoding='utf-8') as f:
+    id2crime = json.load(f)
+for idx, crime in zip(id_all, predictions_charge):
+    crime=id2crime[str(crime)]
+    results.append({"id": str(int(idx)), "crime": crime})
+
+# 将结果写入到JSON文件中
+with open('predictions.json', 'w', encoding='utf-8') as f:
+    json.dump(results, f, ensure_ascii=False, indent=4)
 #     article_pred = article_out.cpu().argmax(dim=1).numpy()
 #     time_pred = time_out.cpu().argmax(dim=1).numpy()
 #

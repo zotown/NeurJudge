@@ -140,12 +140,14 @@ class Data_Process():
 
     def process_data(self,data):
         fact_all = data
+        # id_all=[]
         # charge_label = []
         # article_label = []
         # time_label = []
         # for index,line in enumerate(data):
         #     line = json.loads(line)
         #     fact = line['fact']
+        #     id=line['id']
         #     charge = line['charge']
         #     article = line['article']
         #     if line['meta']['term_of_imprisonment']['death_penalty'] == True or line['meta']['term_of_imprisonment']['life_imprisonment'] == True:
@@ -158,13 +160,14 @@ class Data_Process():
         #
         #
         #     time_label.append(int(time_labels))
-        #
-        #     fact_all.append(self.parse(fact))
+
+            # fact_all.append(self.parse(fact))
+            # id_all.append(id)
         #
         # article_label = torch.tensor(article_label,dtype=torch.long)
         # charge_label = torch.tensor(charge_label,dtype=torch.long)
         # time_label = torch.tensor(time_label,dtype=torch.long)
-
+        # id = torch.tensor(id,dtype=torch.long)
         documents,sent_lent = self.seq2tensor(fact_all,max_len=350)
         return documents,sent_lent
 
